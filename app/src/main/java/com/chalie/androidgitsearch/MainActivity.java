@@ -25,33 +25,37 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mListView = findViewById(R.id.data_list);
 
+        //use retrofit builder api
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
+                //add a json to java object converter
                 .addConverterFactory(GsonConverterFactory.create());
 
+        //create the retrofit object
         Retrofit retrofit = builder.build();
 
+        //create a request
         GithubClient client = retrofit.create(GithubClient.class);
+        //call a method on the client "user repos"
         Call<List<GithubRepo>> call = client.userRepositories("Chal13W1zz");
 
+        //use an async method for the requests
         call.enqueue(new Callback<List<GithubRepo>>() {
             @Override
             public void onResponse(Call<List<GithubRepo>> call, Response<List<GithubRepo>> response) {
                 List<GithubRepo> reposList = response.body();
                 String[] repositories = new String[reposList.size()];
 
-                for (int i = 0; i < repositories.length ; i++){
+                for (int i = 0; i < repositories.length; i++) {
                     repositories[i] = reposList.get(i).getName();
                 }
 
-                mListView.setAdapter(new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1,repositories));
+                mListView.setAdapter(new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, repositories));
             }
 
             @Override
             public void onFailure(Call<List<GithubRepo>> call, Throwable t) {
-
-                Toast.makeText(MainActivity.this,"Something went wrong", Toast.LENGTH_LONG).show();
-
+                Toast.makeText(MainActivity.this, "Something went wrong :(", Toast.LENGTH_LONG).show();
             }
         });
     }
